@@ -4,8 +4,6 @@ from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_unstructured import UnstructuredLoader
 from langchain_community.document_loaders import WebBaseLoader
-from langchain_community.vectorstores import Chroma
-
 import os
 
 DATA_PATH = 'data'
@@ -109,8 +107,7 @@ def load_web_documents(db):
         chunk_size=250, chunk_overlap=0
     )
     doc_splits = text_splitter.split_documents(docs_list)
-    
-    add_to_chroma(doc_splits, db)
+    db.add_documents(doc_splits)
 
 def prepare_db_rag():
     # check_new_files_and_update()
