@@ -204,3 +204,5 @@ def rag_compile():
 
     rag_work_chain = enter_chain | rag_graph
     return rag_work_chain
+
+model = rag_compile()
