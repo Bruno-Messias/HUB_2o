@@ -19,6 +19,31 @@ from tools import search_trip_recommendations, book_excursion, update_excursion,
 
 from utils import create_tool_node_with_fallback, enter_chain
 
+### ================= Define Tools ==========================================
+update_flight_safe_tools = [search_flights]
+update_flight_sensitive_tools = [update_ticket_to_new_flight, cancel_ticket]
+update_flight_tools = update_flight_safe_tools + update_flight_sensitive_tools
+
+book_hotel_safe_tools = [search_hotels]
+book_hotel_sensitive_tools = [book_hotel, update_hotel, cancel_hotel]
+book_hotel_tools = book_hotel_safe_tools + book_hotel_sensitive_tools
+
+book_car_rental_safe_tools = [search_car_rentals]
+book_car_rental_sensitive_tools = [
+    book_car_rental,
+    update_car_rental,
+    cancel_car_rental,
+]
+book_car_rental_tools = book_car_rental_safe_tools + book_car_rental_sensitive_tools
+
+book_excursion_safe_tools = [search_trip_recommendations]
+book_excursion_sensitive_tools = [book_excursion, update_excursion, cancel_excursion]
+book_excursion_tools = book_excursion_safe_tools + book_excursion_sensitive_tools
+
+primary_assistant_tools = [
+    search_flights
+]
+
 ## ============== Define State ========================
 
 def update_dialog_stack(left: list[str], right: Optional[str]) -> list[str]:
@@ -228,7 +253,6 @@ def pop_dialog_state(state: ToolsState) -> dict:
         "messages": messages,
     }
 
-
 def route_book_car_rental(
     state: ToolsState,
 ) -> Literal[
@@ -248,7 +272,6 @@ def route_book_car_rental(
     if all(tc["name"] in safe_toolnames for tc in tool_calls):
         return "book_car_rental_safe_tools"
     return "book_car_rental_sensitive_tools"
-
 
 def route_book_hotel(
     state: ToolsState,
@@ -270,7 +293,6 @@ def route_book_hotel(
         return "book_hotel_safe_tools"
     return "book_hotel_sensitive_tools"
 
-
 def route_book_excursion(
     state: ToolsState,
 ) -> Literal[
@@ -290,7 +312,6 @@ def route_book_excursion(
     if all(tc["name"] in tool_names for tc in tool_calls):
         return "book_excursion_safe_tools"
     return "book_excursion_sensitive_tools"
-
 
 def route_primary_assistant(
     state: ToolsState,
@@ -364,9 +385,6 @@ def tools_compile():
         ]
     ).partial(time=datetime.now())
 
-    update_flight_safe_tools = [search_flights]
-    update_flight_sensitive_tools = [update_ticket_to_new_flight, cancel_ticket]
-    update_flight_tools = update_flight_safe_tools + update_flight_sensitive_tools
     update_flight_runnable = flight_booking_prompt | llm.bind_tools(
         update_flight_tools + [CompleteOrEscalate]
     )
@@ -396,9 +414,6 @@ def tools_compile():
         ]
     ).partial(time=datetime.now())
 
-    book_hotel_safe_tools = [search_hotels]
-    book_hotel_sensitive_tools = [book_hotel, update_hotel, cancel_hotel]
-    book_hotel_tools = book_hotel_safe_tools + book_hotel_sensitive_tools
     book_hotel_runnable = book_hotel_prompt | llm.bind_tools(
         book_hotel_tools + [CompleteOrEscalate]
     )
@@ -428,13 +443,6 @@ def tools_compile():
         ]
     ).partial(time=datetime.now())
 
-    book_car_rental_safe_tools = [search_car_rentals]
-    book_car_rental_sensitive_tools = [
-        book_car_rental,
-        update_car_rental,
-        cancel_car_rental,
-    ]
-    book_car_rental_tools = book_car_rental_safe_tools + book_car_rental_sensitive_tools
     book_car_rental_runnable = book_car_rental_prompt | llm.bind_tools(
         book_car_rental_tools + [CompleteOrEscalate]
     )
@@ -463,9 +471,6 @@ def tools_compile():
         ]
     ).partial(time=datetime.now())
 
-    book_excursion_safe_tools = [search_trip_recommendations]
-    book_excursion_sensitive_tools = [book_excursion, update_excursion, cancel_excursion]
-    book_excursion_tools = book_excursion_safe_tools + book_excursion_sensitive_tools
     book_excursion_runnable = book_excursion_prompt | llm.bind_tools(
         book_excursion_tools + [CompleteOrEscalate]
     )
@@ -489,9 +494,7 @@ def tools_compile():
         ("placeholder", "{messages}"),
     ]
     ).partial(time=datetime.now())
-    primary_assistant_tools = [
-        search_flights
-    ]
+    
     assistant_runnable = primary_assistant_prompt | llm.bind_tools(
         primary_assistant_tools
         + [
