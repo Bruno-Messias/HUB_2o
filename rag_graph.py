@@ -203,6 +203,6 @@ def rag_compile():
     rag_graph = workflow.compile(checkpointer=memory)
 
     rag_work_chain = enter_chain | rag_graph
-    return rag_work_chain
+    return rag_work_chain, rag_graph
 
-model = rag_compile()
+_ , model = rag_compile()

@@ -37,8 +37,8 @@ def compile_model():
         ["RAGWorkflow", "ToolsWorkflow"],
     )
     
-    rag_work_chain = rag_compile()
-    tools_work_chain = tools_compile()
+    rag_work_chain, _ = rag_compile()
+    tools_work_chain, _ = tools_compile()
     
     super_graph = StateGraph(SystemState)
     super_graph.add_node("RAGWorkflow", get_last_message | rag_work_chain | join_graph)

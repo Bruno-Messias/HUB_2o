@@ -624,6 +624,6 @@ def tools_compile():
     )
 
     tools_work_chain = enter_chain | tools_graph
-    return tools_work_chain
+    return tools_work_chain, tools_graph
 
-model = tools_compile()
+_, model = tools_compile()
