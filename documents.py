@@ -1,9 +1,10 @@
-
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 from langchain_unstructured import UnstructuredLoader
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.vectorstores import Chroma
 
 import os
 
@@ -94,8 +95,26 @@ def check_delete_file():
         ids = results['ids']
         db_vector.delete(ids=ids)
 
+def load_web_documents(db):
+    urls = [
+        "https://lilianweng.github.io/posts/2023-06-23-agent/",
+        "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
+        "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
+    ]
+
+    docs = [WebBaseLoader(url).load() for url in urls]
+    docs_list = [item for sublist in docs for item in sublist]
+
+    text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+        chunk_size=250, chunk_overlap=0
+    )
+    doc_splits = text_splitter.split_documents(docs_list)
+    
+    add_to_chroma(doc_splits, db)
+
 def prepare_db_rag():
-    check_new_files_and_update()
-    check_delete_file()
+    # check_new_files_and_update()
+    # check_delete_file()
+    load_web_documents(db_vector)
     retriever = db_vector.as_retriever(k=4)
     return retriever
