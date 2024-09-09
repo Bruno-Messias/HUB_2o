@@ -4,7 +4,7 @@ pytz
 python-dotenv
 chroma
 unstructured
-"unstructured[all-docs]"
+unstructured[all-docs]
 langchain
 langgraph
 langchain_community
